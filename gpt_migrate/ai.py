@@ -26,6 +26,13 @@ class AI:
             max_tokens=self.max_tokens,
             temperature=self.temperature
         )
+        
+        # Get the token usage from the API response
+        token_usage = response['usage']['total_tokens']
+
+        # Print the total token usage after the completion of the conversation
+        print("Total tokens used (Streaming false):", token_usage)
+        
         if response["choices"][0]["message"]["content"].startswith("INSTRUCTIONS:"):
             return ("INSTRUCTIONS:","",response["choices"][0]["message"]["content"][14:])
         else:
@@ -41,10 +48,20 @@ class AI:
             max_tokens=self.max_tokens,
             temperature=self.temperature
         )
+
+        # Initialize a variable to keep track of total token usage
+        total_tokens_used = 0
+        
         chat = ""
         for chunk in response:
             delta = chunk["choices"][0]["delta"]
             msg = delta.get("content", "")
             chat += msg
+            # Add the token usage for each chunk to the total_tokens_used variable
+            total_tokens_used += chunk['usage']['total_tokens']
+
+        # Print the total token usage after the completion of the conversation
+        print("Total tokens used (Streaming true):", total_tokens_used)
+        
         return chat
     
